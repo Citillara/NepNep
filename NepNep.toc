@@ -1,0 +1,7 @@
+## Interface: 80300
+## Title: NepNep Counter
+## Author: Citillara
+## Version: 1.0
+## SavedVariablesPerCharacter: SavedScore
+main.lua
+NepNep.xml

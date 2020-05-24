@@ -1,0 +1,51 @@
+<!-- MyBigClock v8-->
+
+
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+  <Script file="main.lua"/>
+  <Frame name="NepNep" toplevel="true" parent="UIParent" movable="true" frameStrata="LOW">
+    <Size>
+      <AbsDimension x="172" y="28"/>
+    </Size>
+    <Anchors>
+            <Anchor point="TOP"/>
+        </Anchors>
+
+    <Backdrop name="$parentBackdrop" bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+      <EdgeSize>
+        <AbsValue val="16"/>
+      </EdgeSize>
+      <TileSize>
+        <AbsValue val="16"/>
+      </TileSize>
+      <BackgroundInsets>
+        <AbsInset left="4" right="4" top="4" bottom="4"/>
+      </BackgroundInsets>
+    </Backdrop>
+    <Layers>
+      <Layer level="BACKGROUND">
+        <FontString name="Meow" inherits="GameFontNormal" nonspacewrap="true" text="TOTO">
+          <Size>
+            <AbsDimension x="74" y="28"/>
+          </Size>
+          <Anchors>
+          <Anchor point="CENTER"> 
+             <Offset x="0" y="0"/>
+          </Anchor>
+        </Anchors>
+        </FontString>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame name="MyBigClockDropDownMenu" inherits="UIDropDownMenuTemplate"/>
+    </Frames>
+    <Scripts>
+      <OnUpdate>
+        NepNep_OnUpdate(self, elapsed);
+      </OnUpdate>
+      
+    </Scripts>
+  </Frame>
+
+</Ui>
