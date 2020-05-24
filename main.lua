@@ -12,6 +12,56 @@ f:SetScript("OnEvent", function(self, event)
 end)
 
 local score = 0
+local runallowed = 1
+local visible = 1
+
+
+local frame = CreateFrame("FRAME"); -- Need a frame to respond to events
+frame:RegisterEvent("ADDON_LOADED"); -- Fired when saved variables are loaded
+frame:RegisterEvent("PLAYER_LOGOUT"); -- Fired when about to log out
+
+
+
+local function isempty(s)
+  return s == nil or s == ''
+end
+
+
+function frame:OnEvent(event, arg1)
+ if event == "ADDON_LOADED" then
+  -- Our saved variables are ready at this point. If there are none, both variables will set to nil.
+    if isempty(NepNepScore) then
+        NepNepScore = score
+    else
+        score = NepNepScore
+    end
+
+    if isempty(NepNepEnabled) then
+        NepNepEnabled = runallowed
+    else
+        runallowed = NepNepEnabled
+    end
+
+    if isempty(NepNepVisible) then
+        NepNepVisible = visible
+    else
+        visible = NepNepVisible
+    end
+
+ elseif event == "PLAYER_LOGOUT" then
+    NepNepScore = score
+    NepNepEnabled = runallowed
+    NepNepVisible = visible
+ end
+end
+
+frame:SetScript("OnEvent", frame.OnEvent);
+
+
+SLASH_HAVEWEMET1 = "/hwm";
+function SlashCmdList.HAVEWEMET(msg)
+ print("HaveWeMet has met " .. HaveWeMetCount .. " characters.");
+end
 
 SLASH_NEPNEPSCORE1 = "/nepnepscore"
 SLASH_NEPNEPSCORE2 = "/nns"
@@ -24,6 +74,36 @@ SLASH_NEPNEPRESET1 = "/nepnepreset"
 SLASH_NEPNEPRESET2 = "/nnr"
 SlashCmdList["NEPNEPRESET"] = function(message)
     score = 0
+    NepNepScore = 0
+    print("NepNep score reset")
+end
+
+SLASH_NEPNEPSTART1 = "/nepnepstart"
+SLASH_NEPNEPSTART2 = "/nnstart"
+SlashCmdList["NEPNEPSTART"] = function(message)
+    runallowed = 1
+    print("NepNep score started")
+end
+
+SLASH_NEPNEPSTOP1 = "/nepnepstop"
+SLASH_NEPNEPSTOP2 = "/nnstop"
+SlashCmdList["NEPNEPSTOP"] = function(message)
+    runallowed = 0
+    print("NepNep score stopped")
+end
+
+SLASH_NEPNEPSHOW1 = "/nepnepshow"
+SLASH_NEPNEPSHOW2 = "/nnshow"
+SlashCmdList["NEPNEPSHOW"] = function(message)
+    visible = 1
+    NepNep:Show()
+end
+
+SLASH_NEPNEPHIDE1 = "/nepnephide"
+SLASH_NEPNEPHIDE2 = "/nnhide"
+SlashCmdList["NEPNEPHIDE"] = function(message)
+    visible = 0
+    NepNep:Hide()
 end
 
 print("NepNep  Loaded")
@@ -38,12 +118,18 @@ end
 function f:OnEvent(event, ...)
     local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, extraArg1, extraArg2, extraArg3, extraArg4, extraArg5, extraArg6, extraArg7, extraArg8, extraArg9, extraArg10 = CombatLogGetCurrentEventInfo()
 
+    if runallowed == 0 then
+        return
+    end
+
+    local amount = 0
+
+
     if sourceGUID == playerGUID or destGUID == playerGUID  then
         print("Event " .. event)
     end
 
     if sourceGUID == playerGUID and damageEvents[event] then
-        local amount = 0
         if event == "SWING_DAMAGE" then
             print("Player swing dealt " .. extraArg1 .. " with " .. extraArg2 .. " overkill")
             amount = extraArg1 - extraArg2
@@ -109,6 +195,10 @@ if event == "SPELL_AURA_APPLIED" then
     end
     ]]--
 
+    if amount ~= 0 then
+        NepNepScore = score
+    end
+
 end
 
 function C(v)
@@ -118,5 +208,3 @@ function C(v)
         return v
     end
 end
-
-

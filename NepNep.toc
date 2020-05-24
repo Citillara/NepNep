@@ -2,6 +2,6 @@
 ## Title: NepNep Counter
 ## Author: Citillara
 ## Version: 1.0
-## SavedVariablesPerCharacter: SavedScore
+## SavedVariablesPerCharacter: NepNepScore, NepNepEnabled, NepNepVisible
 main.lua
 NepNep.xml
