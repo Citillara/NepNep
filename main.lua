@@ -13,6 +13,7 @@ local debugprint = 0
 local frame = CreateFrame("FRAME"); -- Need a frame to respond to events
 frame:RegisterEvent("ADDON_LOADED"); -- Fired when saved variables are loaded
 frame:RegisterEvent("PLAYER_LOGOUT"); -- Fired when about to log out
+frame:RegisterEvent("QUEST_TURNED_IN"); -- Fired when about to log out
 
 frame:SetScript("OnEvent", frame.OnEvent);
 
@@ -24,8 +25,8 @@ combatframe:SetScript("OnEvent", function(self, event)
 end)
 
 local questframe = CreateFrame("FRAME"); -- Need a frame to respond to events
-questframe:RegisterEvent ("QUEST_TURNED_IN")
-questframe:SetScript("OnEvent", frame.OnEvent);
+questframe:RegisterEvent("QUEST_TURNED_IN")
+questframe:SetScript("OnEvent", questframe.OnEvent);
 
 
 SLASH_NEPNEPSCORE1 = "/nepnepscore"
@@ -168,46 +169,49 @@ function NepNep_OnMouseDown(self, button)
 end
 
 function frame:OnEvent(event, arg1)
- if event == "ADDON_LOADED" then
-  -- Our saved variables are ready at this point. If there are none, both variables will set to nil.
+    if event == "ADDON_LOADED" then
+    -- Our saved variables are ready at this point. If there are none, both variables will set to nil.
     print("NepNep ADDON_LOADED")
 
     if isempty(NepNepScore) then
-        NepNepScore = score
+        --NepNepScore = score
     else
         score = NepNepScore
     end
 
     if isempty(NepNepEnabled) then
-        NepNepEnabled = runallowed
+        --NepNepEnabled = runallowed
     else
         runallowed = NepNepEnabled
     end
 
     if isempty(NepNepVisible) then
-        NepNepVisible = visible
+        --NepNepVisible = visible
     else
         visible = NepNepVisible
     end
 
     if isempty(NepNepDebugPrint) then
-        NepNepDebugPrint = debugprint
+        --NepNepDebugPrint = debugprint
     else
         debugprint = NepNepDebugPrint
     end
 
 
- elseif event == "PLAYER_LOGOUT" then
-    NepNepScore = score
-    NepNepEnabled = runallowed
-    NepNepVisible = visible
- end
+    elseif event == "PLAYER_LOGOUT" then
+        NepNepScore = score
+        NepNepEnabled = runallowed
+        NepNepVisible = visible
+    else
+        print(event)
+    end
 end
 
 
 
-function questframe:OnEvent(event, questID, xpReward, moneyReward)
-    print("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
+function questframe:OnEvent(event, ...)
+    print(event)
+    --print("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
 
 end
 
