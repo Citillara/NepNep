@@ -23,6 +23,11 @@ combatframe:SetScript("OnEvent", function(self, event)
     self:OnEvent(event, CombatLogGetCurrentEventInfo())
 end)
 
+local questframe = CreateFrame("FRAME"); -- Need a frame to respond to events
+questframe:RegisterEvent ("QUEST_TURNED_IN")
+questframe:SetScript("OnEvent", frame.OnEvent);
+
+
 SLASH_NEPNEPSCORE1 = "/nepnepscore"
 SLASH_NEPNEPSCORE2 = "/nnscore"
 SlashCmdList["NEPNEPSCORE"] = function(message)
@@ -99,6 +104,14 @@ end
 local function dprint(msg)
     if debugprint == 1 then
         print(msg)
+    end
+end
+
+local function parseInt(s)
+    if s == nil then
+        return 0
+    else 
+        return tonumber(s)
     end
 end
 
@@ -192,6 +205,13 @@ function frame:OnEvent(event, arg1)
 end
 
 
+
+function questframe:OnEvent(event, questID, xpReward, moneyReward)
+    print("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
+
+end
+
+-- /console scriptErrors 1
 function combatframe:OnEvent(event, ...)
     local timestamp, event, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, extraArg1, extraArg2, extraArg3, extraArg4, extraArg5, extraArg6, extraArg7, extraArg8, extraArg9, extraArg10 = CombatLogGetCurrentEventInfo()
 
@@ -202,19 +222,33 @@ function combatframe:OnEvent(event, ...)
     local amount = 0
 
 
-    --if sourceGUID == playerGUID or destGUID == playerGUID  then
-    --    print("Event " .. event)
-    --end
+    if sourceGUID == playerGUID or destGUID == playerGUID  then
+        --print("Event " .. event)
+    end
 
+    -- Damage dealt
     if sourceGUID == playerGUID and damageEvents[event] then
+        local damagedealt = 0
+        local overkill = 0
         if event == "SWING_DAMAGE" then
             dprint("[" .. timestamp .."] " .. "Player swing dealt " .. extraArg1 .. " with " .. extraArg2 .. " overkill")
-            amount = extraArg1 - extraArg2
+
+            damagedealt = parseInt(extraArg1)
+            local tmp = parseInt(extraArg2)
+            if tmp >= 0 then
+                overkill = tmp
+            end
         end
         if event == "SPELL_DAMAGE" then
             dprint("[" .. timestamp .."] " .. "Player spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
-            amount = extraArg4 - extraArg5
+
+            damagedealt = parseInt(extraArg4)
+            local tmp = parseInt(extraArg5)
+            if tmp >= 0 then
+                overkill = tmp
+            end
         end
+        amount = damagedealt - overkill
         score = score + amount
     end
 
@@ -228,14 +262,23 @@ function combatframe:OnEvent(event, ...)
             dprint("[" .. timestamp .."] " .. "Ennemy spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
             amount = extraArg4 - extraArg5
         end
-        score = score - amount
+        score = score - amount*2
+    end
+
+    if destGUID == playerGUID then
+        if event == "SWING_MISS" then
+            dprint("[" .. timestamp .."] " .. "Ennemy swing missed. Type =" .. C(extraArg1) .. " - Amount " .. C(extraArg3) .. " overkill")
+        end
+        if event == "SPELL_ABSORBED" then
+            dprint("[" .. timestamp .."] " .. "Ennemy spell was absorbed " .. C(extraArg4))
+        end
     end
 
 
     if destGUID == playerGUID and event == "SPELL_HEAL" then
         if sourceGUID == playerGUID then
             dprint("[" .. timestamp .."] " .. "Player self healed for " .. extraArg4 .. " with " .. extraArg5 .. " overheal" )
-            amount = extraArg4 - extraArg5
+            amount = 0 - extraArg4 - extraArg5
         else
             dprint("[" .. timestamp .."] " .. sourceName .." healed player for " .. extraArg4 .. " with " .. extraArg5 .. " overheal" )
             amount = 0 - extraArg4 - extraArg5
@@ -246,10 +289,8 @@ function combatframe:OnEvent(event, ...)
     if event == "PARTY_KILL" then
         if sourceGUID == playerGUID then
             dprint("[" .. timestamp .."] " .. "Player killed " .. C(destName))
-            score = score + 1000
         else
             dprint("[" .. timestamp .."] " .. C(sourceName) .. " killed " .. C(destName))
-            score = score - 500
         end
     end
 
