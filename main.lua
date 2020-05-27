@@ -227,8 +227,8 @@ end
 --                    Quest turned in
 --------------------------------------------------------------
 function questframe:OnEvent(event, questID, xpReward, moneyReward)
-    print(event)
-    print("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
+    dprint(event)
+    dprint("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
 
 end
 
@@ -246,7 +246,7 @@ function combatframe:OnEvent(event, ...)
 
 
     if sourceGUID == playerGUID or destGUID == playerGUID  then
-        print("Event " .. event)
+        --dprint("Event " .. event)
     end
 
     -------------------------------
