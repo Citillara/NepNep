@@ -325,7 +325,7 @@ function combatframe:OnEvent(event, ...)
                 overhealed = tmp
             end
             dprint("[" .. timestamp .."] " .. "Player self healed for " .. healed .. " with " .. overhealed .. " overheal" )
-        else
+        --[[else
             --dprint("[" .. timestamp .."] " .. sourceName .." healed player for " .. extraArg4 .. " with " .. extraArg5 .. " overheal" )
             
             healed = parseInt(extraArg4)
@@ -334,6 +334,7 @@ function combatframe:OnEvent(event, ...)
                 overhealed = tmp
             end
             dprint("[" .. timestamp .."] " .. sourceName .." healed player for " .. healed .. " with " .. overhealed .. " overheal" )
+        ]]--
         end
 
         amount = healed - overhealed
@@ -355,16 +356,29 @@ function combatframe:OnEvent(event, ...)
 
 
     if destGUID == playerGUID and event == "SPELL_AURA_APPLIED" then
-        print(C(sourceName) .. " applied aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        --dprint(C(sourceName) .. " applied aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+
+        if extraArg4 == "BUFF" then
+            if isempty(extraArg5) then
+                return
+            else
+                dprint(C(sourceName) .. " applied aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+
+                local auraAmount = parseInt(extraArg5)
+
+                score = score - ( auraAmount * 2 )
+            end
+        end
+
     end
     if destGUID == playerGUID and event == "SPELL_AURA_REFRESH" then
-        print(C(sourceName) .. " refreshed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        --dprint(C(sourceName) .. " refreshed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
     end
     if destGUID == playerGUID and event == "SPELL_AURA_REMOVED" then
-        print(C(sourceName) .. " removed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        --dprint(C(sourceName) .. " removed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
     end
     if destGUID == playerGUID and event == "SPELL_AURA_STOLEN" then
-        print(C(sourceName) .. " stole aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        --dprint(C(sourceName) .. " stole aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
     end
 
 
