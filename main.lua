@@ -119,7 +119,7 @@ local function parseInt(s)
     if s == nil then
         return 0
     else 
-        return tonumber(s)
+        return tonumber(string.format("%.0f", s))
     end
 end
 
