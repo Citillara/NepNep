@@ -6,7 +6,7 @@
   <Script file="main.lua"/>
   <Frame name="NepNep" toplevel="true" parent="UIParent" movable="true" frameStrata="LOW">
     <Size>
-      <AbsDimension x="172" y="28"/>
+      <AbsDimension x="200" y="28"/>
     </Size>
     <Anchors>
             <Anchor point="TOP"/>
@@ -27,7 +27,7 @@
       <Layer level="BACKGROUND">
         <FontString name="Meow" inherits="GameFontNormal" nonspacewrap="true" text="TOTO">
           <Size>
-            <AbsDimension x="74" y="28"/>
+            <AbsDimension x="200" y="28"/>
           </Size>
           <Anchors>
           <Anchor point="CENTER"> 

@@ -11,7 +11,9 @@ local damageEvents = {
 local score = 0
 local runallowed = 1
 local visible = 1
-local debugprint = 0
+local debugprint = 1
+
+local scorefrozen = 0
 
 local frame = CreateFrame("FRAME"); -- Need a frame to respond to events
 frame:RegisterEvent("ADDON_LOADED"); -- Fired when saved variables are loaded
@@ -245,8 +247,12 @@ function combatframe:OnEvent(event, ...)
     local amount = 0
 
 
-    if sourceGUID == playerGUID or destGUID == playerGUID  then
-        --dprint("Event " .. event)
+    if destGUID == playerGUID and sourceGUID == playerGUID then
+        dprint("PS Event " .. event)
+    elseif destGUID == playerGUID  then
+        dprint("PT Event " .. event)
+    elseif sourceGUID == playerGUID then
+        dprint("PO Event " .. event)
     end
 
     -------------------------------
@@ -276,7 +282,6 @@ function combatframe:OnEvent(event, ...)
             dprint("[" .. timestamp .."] " .. "Player spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
         end
         amount = damagedealt - overkill
-        score = score + amount
     end
     
     -------------------------------
@@ -305,8 +310,7 @@ function combatframe:OnEvent(event, ...)
             end
             dprint("[" .. timestamp .."] " .. "Ennemy spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
         end
-        amount = damagedealt - overkill
-        score = score - (amount * 2)
+        amount = (0 - (damagedealt - overkill)) * 2
     end
 
 
@@ -337,21 +341,21 @@ function combatframe:OnEvent(event, ...)
         ]]--
         end
 
-        amount = healed - overhealed
-        score = score - (amount * 2)
+        amount = (0 - (healed - overhealed)) * 2
+
+        dprint(amount)
     end
 
 
     -- extraArg1 = Falling
     if destGUID == playerGUID and event == "ENVIRONMENTAL_DAMAGE" then
         dprint("[" .. timestamp .."] " .. "ENVIRONMENT damaged " .. C(destName) .. " for " .. C(extraArg2))
-        amount = extraArg2
-        score = score - (amount * 2)
+        amount = (0 - extraArg2) * 2
     end
 
     if destGUID == playerGUID and event == "UNIT_DIED" then
         dprint("[" .. timestamp .."] " .. "Player died")
-        score = score - 1000000
+        amount = -1000000
     end
 
 
@@ -359,9 +363,7 @@ function combatframe:OnEvent(event, ...)
         --dprint(C(sourceName) .. " applied aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
 
         if extraArg4 == "BUFF" then
-            if isempty(extraArg5) then
-                return
-            else
+            if isempty(extraArg5) == false then
                 dprint(C(sourceName) .. " applied aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
 
                 local auraAmount = parseInt(extraArg5)
@@ -371,16 +373,85 @@ function combatframe:OnEvent(event, ...)
         end
 
     end
-    if destGUID == playerGUID and event == "SPELL_AURA_REFRESH" then
-        --dprint(C(sourceName) .. " refreshed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+
+    if sourceGUID == playerGUID and event == "SPELL_CAST_SUCCESS" then
+        dprint("A1=" .. C(extraArg1) .. 
+            " - A2=" .. C(extraArg2) ..
+            " - A3=" .. C(extraArg3) ..
+            " - A4=" .. C(extraArg4) ..
+            " - A5=" .. C(extraArg5) ..
+            " - A6=" .. C(extraArg6) ..
+            " - A7=" .. C(extraArg7) ..
+            " - A8=" .. C(extraArg8) ..
+            " - A9=" .. C(extraArg9) ..
+            " - A10=" .. C(extraArg10))
+
+        if extraArg1 == 642 then -- Divine Aura
+            print("Score frozen because of " .. C(extraArg2))
+            scorefrozen = scorefrozen + 1
+        end
+    end
+    if sourceGUID == playerGUID and event == "SPELL_AURA_APPLIED" then
+            dprint("A1=" .. C(extraArg1) .. 
+            " - A=" .. C(extraArg2) ..
+            " - A2=" .. C(extraArg3) ..
+            " - A2=" .. C(extraArg4) ..
+            " - A2=" .. C(extraArg5) ..
+            " - A2=" .. C(extraArg6) ..
+            " - A2=" .. C(extraArg7) ..
+            " - A2=" .. C(extraArg8) ..
+            " - A2=" .. C(extraArg9) ..
+            " - A2=" .. C(extraArg10))
+    end
+    if sourceGUID == playerGUID and event == "SPELL_AURA_REFRESH" then
+                dprint("A1=" .. C(extraArg1) .. 
+            " - A=" .. C(extraArg2) ..
+            " - A2=" .. C(extraArg3) ..
+            " - A2=" .. C(extraArg4) ..
+            " - A2=" .. C(extraArg5) ..
+            " - A2=" .. C(extraArg6) ..
+            " - A2=" .. C(extraArg7) ..
+            " - A2=" .. C(extraArg8) ..
+            " - A2=" .. C(extraArg9) ..
+            " - A2=" .. C(extraArg10))
     end
     if destGUID == playerGUID and event == "SPELL_AURA_REMOVED" then
-        --dprint(C(sourceName) .. " removed aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        dprint("A1=" .. C(extraArg1) .. 
+            " - A2=" .. C(extraArg2) ..
+            " - A3=" .. C(extraArg3) ..
+            " - A4=" .. C(extraArg4) ..
+            " - A5=" .. C(extraArg5) ..
+            " - A6=" .. C(extraArg6) ..
+            " - A7=" .. C(extraArg7) ..
+            " - A8=" .. C(extraArg8) ..
+            " - A9=" .. C(extraArg9) ..
+            " - A10=" .. C(extraArg10))
+
+        if extraArg1 == 642 then -- Divine Aura
+            scorefrozen = scorefrozen - 1
+            if(scorefrozen == 0) then
+                print("Score no longer frozen")
+            end
+        end
     end
     if destGUID == playerGUID and event == "SPELL_AURA_STOLEN" then
-        --dprint(C(sourceName) .. " stole aura on " .. C(destName) .. " of type " .. C(extraArg4) .. " for " .. C(extraArg5))
+        dprint("A1=" .. C(extraArg1) .. 
+            " - A2=" .. C(extraArg2) ..
+            " - A3=" .. C(extraArg3) ..
+            " - A4=" .. C(extraArg4) ..
+            " - A5=" .. C(extraArg5) ..
+            " - A6=" .. C(extraArg6) ..
+            " - A7=" .. C(extraArg7) ..
+            " - A8=" .. C(extraArg8) ..
+            " - A9=" .. C(extraArg9) ..
+            " - A10=" .. C(extraArg10))
     end
 
+    if amount > 0 and  scorefrozen == 0 then
+        score = score + amount
+    elseif amount < 0 then 
+        score = score + amount
+    end
 
     -------------------------------
     --           Kills 
