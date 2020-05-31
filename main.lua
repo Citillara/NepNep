@@ -11,7 +11,7 @@ local damageEvents = {
 local score = 0
 local runallowed = 1
 local visible = 1
-local debugprint = 1
+local debugprint = 0
 
 local scorefrozen = 0
 
@@ -184,7 +184,7 @@ end
 function frame:OnEvent(event, arg1)
     if event == "ADDON_LOADED" then
     -- Our saved variables are ready at this point. If there are none, both variables will set to nil.
-    print("NepNep ADDON_LOADED")
+    dprint("NepNep ADDON_LOADED")
 
     if isempty(NepNepScore) then
         --NepNepScore = score
@@ -216,7 +216,7 @@ function frame:OnEvent(event, arg1)
         NepNepEnabled = runallowed
         NepNepVisible = visible
     else
-        print(event)
+        dprint(event)
     end
 end
 
@@ -231,7 +231,7 @@ end
 function questframe:OnEvent(event, questID, xpReward, moneyReward)
     dprint(event)
     dprint("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
-
+    score = score + 100
 end
 
 --------------------------------------------------------------
