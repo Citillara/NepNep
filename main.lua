@@ -36,6 +36,14 @@ questframe:SetScript("OnEvent", function(self, event, questID, xpReward, moneyRe
 end)
 
 
+local keyloggerframe  = Test or CreateFrame("Frame", "Test", UIParent)
+keyloggerframe:SetScript("OnKeyDown",  function(self, key)
+    self:OnEvent(event, key)
+end)
+keyloggerframe:SetPropagateKeyboardInput(true)
+
+
+
 SLASH_NEPNEPSCORE1 = "/nepnepscore"
 SLASH_NEPNEPSCORE2 = "/nnscore"
 SlashCmdList["NEPNEPSCORE"] = function(message)
@@ -92,6 +100,7 @@ SlashCmdList["NEPNEPSTOPPRINTDEBUG"] = function(message)
     debugprint = 0
     print("NepNep stopped printing debug")
 end
+
 
 --------------------------------------------------------------------------------------------------------------------------------
 --                                                UTILITY FUNCTIONS
@@ -232,6 +241,25 @@ function questframe:OnEvent(event, questID, xpReward, moneyReward)
     dprint(event)
     dprint("Event : QUEST_TURNED_IN - QuestID :" .. C(questID).. " - xpReward :" .. C(xpReward) .. " - moneyReward :".. C(moneyReward))
     score = score + 100
+end
+
+
+--------------------------------------------------------------
+--                      Key pressed
+--------------------------------------------------------------
+local lasttimekeypressed = 0
+
+function keyloggerframe:OnEvent(event, key)
+
+    if key == "SPACE" then
+
+        seconds = GetTime();
+        local diff = seconds - lasttimekeypressed
+        if diff > 1.9 then
+            score = score - 100
+            lasttimekeypressed = seconds
+        end
+    end
 end
 
 --------------------------------------------------------------
