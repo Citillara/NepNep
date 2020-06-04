@@ -8,6 +8,15 @@ local damageEvents = {
     SPELL_DAMAGE = true,
 }
 
+local validEnvironmentalDamage = {
+    Falling = true,
+    Drowning = true,
+    Fatigue = true,
+    Fire = true,
+    Lava = true,
+    Slime = true,
+}
+
 local score = 0
 local runallowed = 1
 local visible = 1
@@ -116,7 +125,7 @@ local function C(v)
     if v == nil then
         return "nil"
     else
-        return v
+        return tostring(v)
     end
 end
 
@@ -180,7 +189,7 @@ function NepNep_OnUpdate(self, elapsed)
     if isempty(score) then
         return
     end
-    Meow:SetText(SeparateDigits(score," ",  ","))
+    Meow:SetText("Score " .. "\n" .. SeparateDigits(score," ",  ","))
 end
 
 function NepNep_OnMouseDown(self, button)
@@ -195,6 +204,7 @@ function frame:OnEvent(event, arg1)
     -- Our saved variables are ready at this point. If there are none, both variables will set to nil.
     dprint("NepNep ADDON_LOADED")
 
+    Meow:SetFont("Interface\\Addons\\NepNep\\EUROCAPS.TTF", 21)
     if isempty(NepNepScore) then
         --NepNepScore = score
     else
@@ -297,7 +307,7 @@ function combatframe:OnEvent(event, ...)
             if tmp >= 0 then
                 overkill = tmp
             end
-            dprint("[" .. timestamp .."] " .. "Player swing dealt " .. damagedealt .. " with " .. extraArg2 .. " overkill")
+            dprint("[" .. timestamp .."] " .. "Player swing dealt " .. damagedealt .. " with " .. overkill .. " overkill")
         end
         if event == "SPELL_DAMAGE" then
             --dprint("[" .. timestamp .."] " .. "Player spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
@@ -305,9 +315,10 @@ function combatframe:OnEvent(event, ...)
             damagedealt = parseInt(extraArg4)
             local tmp = parseInt(extraArg5)
             if tmp >= 0 then
+                dprint("tmp positive")
                 overkill = tmp
             end
-            dprint("[" .. timestamp .."] " .. "Player spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
+            dprint("[" .. timestamp .."] " .. "Player spell dealt " .. damagedealt .. " with " .. overkill .. " overkill")
         end
         amount = damagedealt - overkill
     end
@@ -326,7 +337,7 @@ function combatframe:OnEvent(event, ...)
             if tmp >= 0 then
                 overkill = tmp
             end
-            dprint("[" .. timestamp .."] " .. "Ennemy swing dealt " .. damagedealt .. " with " .. extraArg2 .. " overkill")
+            dprint("[" .. timestamp .."] " .. "Ennemy swing dealt " .. damagedealt .. " with " .. overkill .. " overkill")
         end
         if event == "SPELL_DAMAGE" then
             --dprint("[" .. timestamp .."] " .. "Player spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
@@ -335,10 +346,20 @@ function combatframe:OnEvent(event, ...)
             local tmp = parseInt(extraArg5)
             if tmp >= 0 then
                 overkill = tmp
-            end
-            dprint("[" .. timestamp .."] " .. "Ennemy spell dealt " .. extraArg4 .. " with " .. extraArg5 .. " overkill")
+            end        
+            dprint("A1=" .. C(extraArg1) .. 
+            " - A2=" .. C(extraArg2) ..
+            " - A3=" .. C(extraArg3) ..
+            " - A4=" .. C(extraArg4) ..
+            " - A5=" .. C(extraArg5) ..
+            " - A6=" .. C(extraArg6) ..
+            " - A7=" .. C(extraArg7) ..
+            " - A8=" .. C(extraArg8) ..
+            " - A9=" .. C(extraArg9) ..
+            " - A10=" .. C(extraArg10))
+            dprint("[" .. timestamp .."] " .. "Ennemy spell dealt " .. damagedealt .. " with " .. overkill .. " overkill")
         end
-        amount = (0 - (damagedealt - overkill)) * 2
+        amount = (0 - (damagedealt - overkill)) * 3
     end
 
 
@@ -369,21 +390,22 @@ function combatframe:OnEvent(event, ...)
         ]]--
         end
 
-        amount = (0 - (healed - overhealed)) * 2
+        amount = (0 - (healed - overhealed)) * 3
 
         dprint(amount)
     end
 
 
     -- extraArg1 = Falling
-    if destGUID == playerGUID and event == "ENVIRONMENTAL_DAMAGE" then
-        dprint("[" .. timestamp .."] " .. "ENVIRONMENT damaged " .. C(destName) .. " for " .. C(extraArg2))
-        amount = (0 - extraArg2) * 2
+    if destGUID == playerGUID and event == "ENVIRONMENTAL_DAMAGE" and validEnvironmentalDamage[extraArg1] then        
+
+        dprint("[" .. timestamp .."] " .. "Environment " .. C(extraArg1) .. " damaged " .. C(destName) .. " for " .. C(extraArg2))
+        amount = (0 - extraArg2) * 3
     end
 
     if destGUID == playerGUID and event == "UNIT_DIED" then
         dprint("[" .. timestamp .."] " .. "Player died")
-        amount = -1000000
+        amount = -1000
     end
 
 
